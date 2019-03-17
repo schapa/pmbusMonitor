@@ -37,6 +37,12 @@ typedef enum {
 	BSP_Pin_SEG_G,
 	BSP_Pin_SEG_H,
 
+	BPS_Pin_Uart_Tx,
+	BPS_Pin_Uart_Rx,
+
+	BSP_Pin_SCL,
+	BPS_Pin_SDA,
+
 	BSP_Pin_Last,
 } BSP_Pin_t;
 
@@ -49,8 +55,11 @@ void BSP_FeedWatchdog(void);
 void BSP_SetPinVal(const BSP_Pin_t pin, const _Bool state);
 _Bool BSP_GetPinVal(const BSP_Pin_t pin);
 
+void BSP_SetLedVal(int pos, uint8_t val, _Bool dot);
 
-void BSP_SetLedVal(uint8_t val);
+void BSP_SetDisplayString(const char *str);
+
+_Bool BSP_i2c_test(int devAdr);
 
 #ifdef __cplusplus
 }

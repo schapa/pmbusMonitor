@@ -2,6 +2,7 @@
 CFLAGS += \
 	-I./inc \
 	-I./src \
+	-I./src/dbg \
 	-I./lib/ \
 	
 CFLAGS += \
@@ -19,8 +20,8 @@ CFLAGS += \
 	-I./sdk/include/stm32f1-stdperiph \
 	
 export SRC := \
-	$(wildcard ./src/*.c) \
-	$(wildcard ./src/*.cpp) \
+	$(wildcard ./src/*.c*) \
+	$(wildcard ./src/dbg/*.c*) \
 	$(wildcard ./lib/src/*.c) \
 	\
 	./sdk/src/stm32f1-stdperiph/stm32f10x_rcc.c \
@@ -29,4 +30,7 @@ export SRC := \
 	./sdk/src/stm32f1-stdperiph/stm32f10x_iwdg.c \
 	./sdk/src/stm32f1-stdperiph/misc.c \
 	./sdk/src/stm32f1-stdperiph/stm32f10x_tim.c \
+	./sdk/src/stm32f1-stdperiph/stm32f10x_usart.c \
+	./sdk/src/stm32f1-stdperiph/stm32f10x_dma.c \
+	./sdk/src/stm32f1-stdperiph/stm32f10x_i2c.c \
 

@@ -8,10 +8,12 @@
 
 #include "system.h"
 #include "systemTimer.h"
-#include <stddef.h>
 #include "timers.h"
 #include "Queue.h"
 #include "bsp.h"
+
+#include <stddef.h>
+#include <stdio.h>
 
 #include "stm32f10x.h"
 
@@ -76,6 +78,7 @@ uint32_t System_getUptimeMs(void) {
 
 void SysTick_Handler(void);
 
+void BSP_SetDisplayString(const char *str);
 void SysTick_Handler(void) {
 	if (s_systemLed) {
 		uint32_t period = s_timing[s_systemStatus].activeTime + s_timing[s_systemStatus].passiveTime;
