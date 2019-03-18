@@ -16,8 +16,8 @@ extern "C" {
 #include <stddef.h>
 
 void Trace_Init(void);
-void Trace_dataAsync(char *buff, size_t size);
-void Trace_dataAsyncFlush(void);
+void Trace_dataAsync(const char *buff, size_t size);
+_Bool Trace_dataAsyncFlush(void);
 void Trace_dataSync(const char *buff, size_t size);
 
 

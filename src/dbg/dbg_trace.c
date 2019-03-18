@@ -10,6 +10,7 @@
 #include "systemTimer.h"
 
 #include <stdlib.h> // malloc
+#include <alloca.h> // malloc
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
@@ -18,17 +19,22 @@
 #define CHECK(x,y) x > y ? x - y : 0
 
 void Trace_dataAsync(char *buff, size_t size);
+void Trace_dataSync(char *buff, size_t size);
+_Bool Trace_dataAsyncFlush(void);
 
+#pragma GCC optimize ("O3")
 void dbgmsg(const char *color, const char *siverity, const char *file, const char *func, int line, const char *fmt, ...) {
 	size_t bufferSize = MAX_TRACE_LEN;
 	char *buff = NULL;
-	while (!buff && bufferSize) {
-		buff = malloc(bufferSize);
-		if (!buff)
-			bufferSize /= 2;
-	}
-	if (!buff)
-		return;
+    while (!buff && bufferSize) {
+        buff = alloca(bufferSize);
+        if (!buff) {
+        	Trace_dataAsyncFlush();
+            bufferSize /= 2;
+        }
+    }
+    if (!buff)
+        return;
 	int occupied = 0;
 	if (line) {
 		occupied = snprintf(buff, bufferSize, "[%4lu.%03lu] %s::%s (%d)%s %s: ",
@@ -48,8 +54,12 @@ void dbgmsg(const char *color, const char *siverity, const char *file, const cha
 		char *trim = "...\r\n";
 		size_t size = strlen(trim) + 1;
 		snprintf(&buff[bufferSize-size], size, trim);
-	} else
-		buff = realloc(buff, occupied);
-
-	Trace_dataAsync(buff, occupied);
+	}
+#if 01
+	char *sndBuff = malloc(occupied);
+	memcpy(sndBuff, buff, occupied);
+	Trace_dataAsync(sndBuff, occupied);
+#else
+	Trace_dataSync(buff, occupied);
+#endif
 }

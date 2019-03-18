@@ -13,6 +13,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #define BSP_TICKS_PER_SECOND 1000
 #define MINUTE_TICKS (BSP_TICKS_PER_SECOND*60)
@@ -59,7 +60,7 @@ void BSP_SetLedVal(int pos, uint8_t val, _Bool dot);
 
 void BSP_SetDisplayString(const char *str);
 
-_Bool BSP_i2c_test(int devAdr);
+_Bool BSP_i2c_test(int devAdr, uint8_t *buff, size_t size);
 
 #ifdef __cplusplus
 }

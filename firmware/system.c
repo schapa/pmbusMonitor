@@ -8,21 +8,23 @@
 #include "system.h"
 #include "stm32f10x.h"
 
-#if 0
-static volatile int s_lock;
+#include <stdatomic.h>
+
+static atomic_int s_lock;
 
 void System_Lock(void) {
-    if (!s_lock++) {
+    int lock = atomic_fetch_add(&s_lock, 1);
+    if (!lock) {
         __disable_irq();
     }
 }
 
 void System_Unlock(void) {
-    if (s_lock-- <= 1) {
+    int lock = atomic_fetch_sub(&s_lock, 1);
+    if (lock <= 1) {
         __enable_irq();
     }
 }
-#endif
 
 void System_Poll(void) {
     __WFE();

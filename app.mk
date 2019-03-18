@@ -18,7 +18,9 @@ CFLAGS += \
 	-I./sdk/include/cortexm/ \
 	-I./sdk/include/diag \
 	-I./sdk/include/stm32f1-stdperiph \
-	
+	\
+	-Wno-misleading-indentation \
+
 export SRC := \
 	$(wildcard ./src/*.c*) \
 	$(wildcard ./src/dbg/*.c*) \
