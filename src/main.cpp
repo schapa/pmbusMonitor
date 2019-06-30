@@ -33,20 +33,41 @@ int main(int argc, char* argv[]) {
 	};
 	size_t pos = 0;
 	DBGMSG_INFO("System started");
-	DBGMSG_INFO("yes");
 	while (true) {
 		Event_t event;
-		if (EventQueue_Pend(&event) && ((uint32_t)event.data > 5)) {
-
-			for (int i = 0; i < 256; ++i) {
-				uint16_t val = 0;
-				SMBus_ReadWord(0x53 << 1, &val, i);
-				DBGMSG_INFO("0x%02X 0x%04X", i, val);
+		EventQueue_Pend(&event);
+		if ((uint32_t)event.data % 5 == 0) {
+			DBGMSG_INFO("Detect");
+			for (int i = 0; i < 8; ++i) {
+				char buff[128];
+				int ocp = 0;
+				for (int j = 0; j < 16; ++j) {
+					uint8_t val = 0;
+					int rv = I2C_burst_read((16 * i + j) << 1, 1, &val, 1);
+					if (rv)
+						ocp += snprintf(buff + ocp, sizeof(buff) - ocp, " - ");
+					else
+						ocp += snprintf(buff + ocp, sizeof(buff) - ocp, "%02X ", val);
+				}
+				DBGMSG_INFO(buff, NULL);
 			}
-//			for (int i = 0; i < 128; ++i) {
-//				if (BSP_i2c_test(i))
-//					DBGMSG_INFO("0x%02X found", i);
-//			}
+		} else if ((uint32_t)event.data % 6 == 0) {
+			DBGMSG_INFO("Dump");
+			for (int i = 0; i < 16; ++i) {
+				char buff[128];
+				int ocp = 0;
+				for (int j = 0; j < 16; ++j) {
+					uint8_t val = 0;
+	//				SMBus_ReadWord(0x53 << 1, &val, i);
+					int rv = I2C_burst_read(0x53 << 1, 16 * i + j, &val, 1);
+					if (rv) {
+						DBGMSG_ERR("fail %d", 16 * i + j);
+						break;
+					}
+					ocp += snprintf(buff + ocp, sizeof(buff) - ocp, "%02X ", val);
+				}
+				DBGMSG_INFO(buff, NULL);
+			}
 		}
 		BSP_FeedWatchdog();
 		uint32_t intVal = (uint32_t)event.data;

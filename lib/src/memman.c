@@ -21,7 +21,8 @@ void *__wrap_malloc(size_t size) {
 	void *ptr = __real_malloc(size);
 #ifndef EMULATOR
     extern char _Heap_Limit;
-	if ((ptr >= (void*)&_stack_Limit) || (ptr >= (void*)&_Heap_Limit)) {
+    int end = (int)ptr + size;
+	if ((end >= (int)&_stack_Limit) || (end >= (int)&_Heap_Limit)) {
 		static const char head[] = "\r\nFATAL: stack smashed. Stack Limit 0x";
 		static const char heap[] = "\r\n                       Heap Limit 0x";
 		static const char fmt[] =  "\r\n                              ptr 0x";
@@ -36,18 +37,28 @@ void *__wrap_malloc(size_t size) {
 		Trace_dataSync(val, size);
 
 		Trace_dataSync(fmt, sizeof(fmt) -1);
-		size = snprintf(val, sizeof(val), "%08X\r\n", (int)ptr);
+		size = snprintf(val, sizeof(val), "%08X\r\n", (int)end);
 		Trace_dataSync(val, size);
-		HardFault_Handler();
+//		HardFault_Handler();
 		ptr = NULL;
 	}
 #endif
+//	char val[16];
+//	size = snprintf(val, sizeof(val), "\r\n;0x%08X;\r\n", (int)ptr);
+//	Trace_dataSync(val, size);
 	System_Unlock();
 	return ptr;
 }
 
 void __wrap_free(void *ptr) {
 	System_Lock();
+	if ((int)ptr < 0x20000000 || (int)ptr > (0x20000000 + 8 * 1024)) {
+		static const char fmt[] =  "\r\n Freeing improper ptr 0x";
+		Trace_dataSync(fmt, sizeof(fmt) -1);
+		char val[12];
+		size_t size = snprintf(val, sizeof(val), "%08X\r\n", (int)ptr);
+		Trace_dataSync(val, size);
+	}
 	__real_free(ptr);
 	System_Unlock();
 }

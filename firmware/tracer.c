@@ -30,7 +30,7 @@ static void inline onTxComplete(void);
 
 void Trace_Init(void) {
 	static const USART_InitTypeDef iface = {
-			921600,
+			921600/8,
 			USART_WordLength_8b,
 			USART_StopBits_1,
 			USART_Parity_No,
@@ -60,7 +60,6 @@ void Trace_Init(void) {
 	DMA_ITConfig(DMA1_Channel4, DMA_IT_TE, ENABLE);
 
 	USART_DMACmd(USART1, USART_DMAReq_Tx, ENABLE);
-//	DMA_Cmd(DMA1_Channel4, ENABLE);
 	initNVIC();
 }
 
@@ -119,7 +118,6 @@ _Bool Trace_dataAsyncFlush(void) {
 void Trace_dataSync(const char *buff, size_t size) {
 	if (!buff || !size)
 		return;
-
 	DMA_Cmd(DMA1_Channel4, DISABLE);
 	DMA_ITConfig(DMA1_Channel4, DMA_IT_TC, DISABLE);
 	DMA_ITConfig(DMA1_Channel4, DMA_IT_TE, DISABLE);
